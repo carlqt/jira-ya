@@ -34,11 +34,8 @@ func main() {
 func GetIssues() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		issues, err := jira.GetIssues()
-		// Create new game
-		// when successful, move state to "waiting for players"
-		// go routine to reply
-		// go routine for a countdown timer and move to next state
 		if err != nil {
+			log.Println(err)
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			w.Write([]byte(err.Error()))
 		} else {

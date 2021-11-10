@@ -14,9 +14,15 @@ type SearchResponse struct {
 }
 
 type Issue struct {
-	Id   string `json:"id"`
-	Key  string `json:"key"`
-	Self string `json:"self"`
+	Id     string     `json:"id"`
+	Key    string     `json:"key"`
+	Self   string     `json:"self"`
+	Fields IssueField `json:"fields"`
+}
+
+type IssueField struct {
+	Summary     string `json:"summary"`
+	Description string `json:"description"`
 }
 
 type SearchRequest struct {
@@ -27,18 +33,7 @@ type SearchRequest struct {
 
 func GetIssues() (SearchResponse, error) {
 	var searchResponse SearchResponse
-	url := "https://sephora-asia.atlassian.net/rest/api/latest/search"
-
-	requestBody := SearchRequest{
-		Jql:        "project=EPS AND labels=SE AND resolution=Unresolved",
-		Fields:     []string{"summary", "description", "status"},
-		MaxResults: 5,
-	}
-
-	jsonBody, _ := json.Marshal(requestBody)
-	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth("***REMOVED***", "***REMOVED***")
+	req, _ := jiraRequest()
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -53,4 +48,27 @@ func GetIssues() (SearchResponse, error) {
 	}
 
 	return searchResponse, nil
+}
+
+func jiraRequest() (*http.Request, error) {
+	username := "***REMOVED***"
+	accessToken := "***REMOVED***"
+	url := "https://sephora-asia.atlassian.net/rest/api/latest/search"
+	requestBody := SearchRequest{
+		Jql:        "project=EPS AND labels=SE AND resolution=Unresolved",
+		Fields:     []string{"summary", "description", "status"},
+		MaxResults: 50,
+	}
+	jsonBody, _ := json.Marshal(requestBody)
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
+
+	if err != nil {
+		return req, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(username, accessToken)
+
+	return req, err
 }
