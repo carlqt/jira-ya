@@ -20,6 +20,7 @@ type Issue struct {
 	Assignee    string `json:"asignee"`
 	Type        string `json:"type"` //EPS or SE
 	Key         string `json:"key"`
+	Link        string `json:"link"`
 }
 
 func AllIssues() ([]Issue, error) {
@@ -37,6 +38,7 @@ func AllIssues() ([]Issue, error) {
 		issue.Description = v.Fields.Description
 		issue.Summary = v.Fields.Summary
 		issue.Assignee = v.Fields.Assignee.DisplayName
+		issue.Link = v.Link()
 
 		issues = append(issues, issue)
 	}

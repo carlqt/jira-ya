@@ -3,6 +3,7 @@ package jira
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -42,6 +43,12 @@ type SearchRequest struct {
 	Jql        string   `json:"jql"`
 	MaxResults int      `json:"maxResults"`
 	Fields     []string `json:"fields"`
+}
+
+func (i *Issue) Link() string {
+	link := fmt.Sprintf("https://sephora-asia.atlassian.net/browse/%s", i.Key)
+
+	return link
 }
 
 func GetIssues() (SearchResponse, error) {
