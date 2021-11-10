@@ -6,6 +6,13 @@ import (
 	"net/http"
 )
 
+type IssueType string
+
+const (
+	SE  IssueType = "SE"
+	EPS IssueType = "EPS"
+)
+
 type SearchResponse struct {
 	MaxResults int     `json:"maxResults"`
 	Total      int     `json:"total"`
@@ -21,8 +28,14 @@ type Issue struct {
 }
 
 type IssueField struct {
-	Summary     string `json:"summary"`
-	Description string `json:"description"`
+	Summary     string   `json:"summary"`
+	Description string   `json:"description"`
+	Assignee    Assignee `json:"assignee"`
+}
+
+type Assignee struct {
+	Id          string `json:"accountId"`
+	DisplayName string `json:"displayName"`
 }
 
 type SearchRequest struct {
@@ -56,7 +69,7 @@ func jiraRequest() (*http.Request, error) {
 	url := "https://sephora-asia.atlassian.net/rest/api/latest/search"
 	requestBody := SearchRequest{
 		Jql:        "project=EPS AND labels=SE AND resolution=Unresolved",
-		Fields:     []string{"summary", "description", "status"},
+		Fields:     []string{"summary", "description", "status", "assignee"},
 		MaxResults: 50,
 	}
 	jsonBody, _ := json.Marshal(requestBody)

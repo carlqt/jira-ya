@@ -12,6 +12,38 @@ import (
 	"github.com/rs/cors"
 )
 
+// https://sephora-asia.atlassian.net/browse/EPS-676
+type Issue struct {
+	Id          string `json:"id"`
+	Summary     string `json:"summary"`
+	Description string `json:"description"`
+	Assignee    string `json:"asignee"`
+	Type        string `json:"type"` //EPS or SE
+	Key         string `json:"key"`
+}
+
+func AllIssues() ([]Issue, error) {
+	var issues []Issue
+	jiraIssues, err := jira.GetIssues()
+
+	if err != nil {
+		return issues, err
+	}
+
+	for _, v := range jiraIssues.Issues {
+		issue := Issue{Type: "EPS"}
+		issue.Id = v.Id
+		issue.Key = v.Key
+		issue.Description = v.Fields.Description
+		issue.Summary = v.Fields.Summary
+		issue.Assignee = v.Fields.Assignee.DisplayName
+
+		issues = append(issues, issue)
+	}
+
+	return issues, err
+}
+
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
@@ -33,7 +65,8 @@ func main() {
 
 func GetIssues() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		issues, err := jira.GetIssues()
+		issues, err := AllIssues()
+
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusUnprocessableEntity)
