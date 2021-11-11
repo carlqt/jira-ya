@@ -43,6 +43,7 @@ func AllIssues(issueType jira.IssueType) ([]Issue, error) {
 	return issues, err
 }
 
+// Get /issues returns all Issues
 func GetIssues() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var issueType jira.IssueType

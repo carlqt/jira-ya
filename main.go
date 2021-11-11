@@ -10,21 +10,32 @@ import (
 	"github.com/rs/cors"
 )
 
-func main() {
+type App struct {
+	Router *mux.Router
+}
+
+func (a *App) Start() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
-	router := mux.NewRouter()
-	router.Handle("/issues", GetIssues()).Methods("GET")
-	router.Use(ResponseHeaderHandler)
-
 	corsOptions := cors.New(cors.Options{
 		// AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"OPTIONS", "GET", "POST"},
 		AllowedHeaders: []string{"Content-Type"},
 	})
 
-	log.Println("starting at port 8000")
-	loggedRouter := handlers.LoggingHandler(os.Stdout, router)
-	http.ListenAndServe(":8000", corsOptions.Handler(loggedRouter))
+	loggedRouter := handlers.LoggingHandler(os.Stdout, a.Router)
 
+	log.Println("starting at port 8000")
+	http.ListenAndServe(":8000", corsOptions.Handler(loggedRouter))
+}
+
+func NewApp() *App {
+	app := new(App)
+	app.Router = NewRouter()
+
+	return app
+}
+
+func main() {
+	app := NewApp()
+	app.Start()
 }
