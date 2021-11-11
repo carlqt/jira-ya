@@ -51,9 +51,9 @@ func (i *Issue) Link() string {
 	return link
 }
 
-func GetIssues(issueType IssueType) (SearchResponse, error) {
+func GetIssues() (SearchResponse, error) {
 	var searchResponse SearchResponse
-	req, _ := jiraRequest(issueType)
+	req, _ := jiraRequest()
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -70,20 +70,13 @@ func GetIssues(issueType IssueType) (SearchResponse, error) {
 	return searchResponse, nil
 }
 
-func jiraRequest(issueType IssueType) (*http.Request, error) {
-	var jql string
+func jiraRequest() (*http.Request, error) {
 	username := "***REMOVED***"
 	accessToken := "***REMOVED***"
 	url := "https://sephora-asia.atlassian.net/rest/api/latest/search"
 
-	if issueType == SE {
-		jql = seJql()
-	} else {
-		jql = epsJql()
-	}
-
 	requestBody := SearchRequest{
-		Jql:        jql,
+		Jql:        fmt.Sprintf("%s OR %s", seJql(), epsJql()),
 		Fields:     []string{"summary", "description", "status", "assignee"},
 		MaxResults: 50,
 	}

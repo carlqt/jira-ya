@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"net/url"
 	"strings"
 
 	"github.com/carlqt/jira-ya/jira"
@@ -22,22 +21,43 @@ type Issue struct {
 	Link        string `json:"link"`
 }
 
-func AllIssues(issueType jira.IssueType) ([]Issue, error) {
-	var issues []Issue
-	jiraIssues, err := jira.GetIssues(issueType)
+type Issues []Issue
+
+func (issues Issues) filterByType(t string) Issues {
+	var newIssues Issues
+
+	if t == "" {
+		return issues
+	}
+
+	for _, issue := range issues {
+		if issue.Type == strings.ToUpper(t) {
+			newIssues = append(newIssues, issue)
+		}
+	}
+
+	return newIssues
+}
+
+func AllIssues() (Issues, error) {
+	var issues Issues
+	jiraIssues, err := jira.GetIssues()
 
 	if err != nil {
 		return issues, err
 	}
 
 	for _, v := range jiraIssues.Issues {
-		issue := Issue{Type: string(issueType)}
-		issue.Id = v.Id
-		issue.Key = v.Key
-		issue.Description = v.Fields.Description
-		issue.Summary = v.Fields.Summary
-		issue.Assignee = v.Fields.Assignee.DisplayName
-		issue.Link = v.Link()
+		k := strings.Split(v.Key, "-")
+		issue := Issue{
+			Id:          v.Id,
+			Summary:     v.Fields.Summary,
+			Description: v.Fields.Description,
+			Assignee:    v.Fields.Assignee.DisplayName,
+			Type:        k[0],
+			Key:         v.Key,
+			Link:        v.Link(),
+		}
 
 		issues = append(issues, issue)
 	}
@@ -48,8 +68,9 @@ func AllIssues(issueType jira.IssueType) ([]Issue, error) {
 // Get /issues returns all Issues
 func GetIssues() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		issueType := getIssueType(r.URL.Query())
-		issues, err := AllIssues(issueType)
+		queryType := r.URL.Query().Get("type")
+		issues, err := AllIssues()
+		issues = issues.filterByType(queryType)
 
 		if err != nil {
 			log.Println(err)
@@ -61,15 +82,4 @@ func GetIssues() http.Handler {
 		}
 
 	})
-}
-
-func getIssueType(query url.Values) jira.IssueType {
-	typeParam := query.Get("type")
-
-	if typeParam != "" {
-		upcaseTypeParam := strings.ToUpper(typeParam)
-		return jira.IssueType(upcaseTypeParam)
-	} else {
-		return jira.EPS
-	}
 }
