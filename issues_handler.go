@@ -4,12 +4,14 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/carlqt/jira-ya/jira"
 )
 
 // https://sephora-asia.atlassian.net/browse/EPS-676
+// Response schema
 type Issue struct {
 	Id          string `json:"id"`
 	Summary     string `json:"summary"`
@@ -46,16 +48,7 @@ func AllIssues(issueType jira.IssueType) ([]Issue, error) {
 // Get /issues returns all Issues
 func GetIssues() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var issueType jira.IssueType
-
-		if r.URL.Query().Get("type") != "" {
-			typeParam := r.URL.Query().Get("type")
-			upcaseTypeParam := strings.ToUpper(typeParam)
-			issueType = jira.IssueType(upcaseTypeParam)
-		} else {
-			issueType = jira.EPS
-		}
-
+		issueType := getIssueType(r.URL.Query())
 		issues, err := AllIssues(issueType)
 
 		if err != nil {
@@ -68,4 +61,15 @@ func GetIssues() http.Handler {
 		}
 
 	})
+}
+
+func getIssueType(query url.Values) jira.IssueType {
+	typeParam := query.Get("type")
+
+	if typeParam != "" {
+		upcaseTypeParam := strings.ToUpper(typeParam)
+		return jira.IssueType(upcaseTypeParam)
+	} else {
+		return jira.EPS
+	}
 }
