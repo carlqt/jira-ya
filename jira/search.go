@@ -51,9 +51,9 @@ func (i *Issue) Link() string {
 	return link
 }
 
-func GetIssues() (SearchResponse, error) {
+func GetIssues(issueType IssueType) (SearchResponse, error) {
 	var searchResponse SearchResponse
-	req, _ := jiraRequest()
+	req, _ := jiraRequest(issueType)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -70,12 +70,20 @@ func GetIssues() (SearchResponse, error) {
 	return searchResponse, nil
 }
 
-func jiraRequest() (*http.Request, error) {
+func jiraRequest(issueType IssueType) (*http.Request, error) {
+	var jql string
 	username := "***REMOVED***"
 	accessToken := "***REMOVED***"
 	url := "https://sephora-asia.atlassian.net/rest/api/latest/search"
+
+	if issueType == SE {
+		jql = seJql()
+	} else {
+		jql = epsJql()
+	}
+
 	requestBody := SearchRequest{
-		Jql:        "project=EPS AND labels=SE AND resolution=Unresolved",
+		Jql:        jql,
 		Fields:     []string{"summary", "description", "status", "assignee"},
 		MaxResults: 50,
 	}
@@ -91,4 +99,12 @@ func jiraRequest() (*http.Request, error) {
 	req.SetBasicAuth(username, accessToken)
 
 	return req, err
+}
+
+func seJql() string {
+	return "project=SE AND sprint in openSprints()"
+}
+
+func epsJql() string {
+	return "project=EPS AND labels=SE AND resolution=Unresolved"
 }

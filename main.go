@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/carlqt/jira-ya/jira"
 	"github.com/gorilla/handlers"
@@ -23,16 +24,16 @@ type Issue struct {
 	Link        string `json:"link"`
 }
 
-func AllIssues() ([]Issue, error) {
+func AllIssues(issueType jira.IssueType) ([]Issue, error) {
 	var issues []Issue
-	jiraIssues, err := jira.GetIssues()
+	jiraIssues, err := jira.GetIssues(issueType)
 
 	if err != nil {
 		return issues, err
 	}
 
 	for _, v := range jiraIssues.Issues {
-		issue := Issue{Type: "EPS"}
+		issue := Issue{Type: string(issueType)}
 		issue.Id = v.Id
 		issue.Key = v.Key
 		issue.Description = v.Fields.Description
@@ -67,7 +68,17 @@ func main() {
 
 func GetIssues() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		issues, err := AllIssues()
+		var issueType jira.IssueType
+
+		if r.URL.Query().Get("type") != "" {
+			typeParam := r.URL.Query().Get("type")
+			upcaseTypeParam := strings.ToUpper(typeParam)
+			issueType = jira.IssueType(upcaseTypeParam)
+		} else {
+			issueType = jira.EPS
+		}
+
+		issues, err := AllIssues(issueType)
 
 		if err != nil {
 			log.Println(err)
