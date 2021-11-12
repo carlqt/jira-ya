@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 )
 
 type IssueType string
@@ -71,8 +72,8 @@ func GetIssues() (SearchResponse, error) {
 }
 
 func jiraRequest() (*http.Request, error) {
-	username := "***REMOVED***"
-	accessToken := "***REMOVED***"
+	username := os.Getenv("USERNAME")
+	accessToken := os.Getenv("ACCESS_TOKEN")
 	url := "https://sephora-asia.atlassian.net/rest/api/latest/search"
 
 	requestBody := SearchRequest{
