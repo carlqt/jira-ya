@@ -1,29 +1,29 @@
 <template>
   <div class="home">
     <PageLoader v-if='loading'/>
-    <table class="primary" v-else>
+    <table class="primary flex-table" v-else>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>City</th>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Summary</th>
+          <th>Description</th>
+          <th>Assignee</th>
+          <th>Link</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Francisco</td>
-          <td>Valencia, Spain</td>
-        </tr>
-        <tr>
-          <td>Eve</td>
-          <td>San Francisco, USA</td>
-        </tr>
-        <tr>
-          <td>Martin</td>
-          <td>New York, USA</td>
-        </tr>
-        <tr>
-          <td>Sarah</td>
-          <td>London, UK</td>
+        <tr v-for="issue in issues" :key="issue.id">
+          <td>{{ issue.id }}</td>
+          <td>{{ issue.type }}</td>
+          <td>{{ issue.summary }}</td>
+          <td>{{ issue.description }}</td>
+          <td>{{ issue.assignee }}</td>
+          <td>
+            <a :href="issue.link" target="_blank">
+              {{ issue.link }}
+            </a>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -42,6 +42,7 @@ export default {
   data () {
     return {
       loading: true,
+      issues: []
     }
   },
   async mounted () {
@@ -49,10 +50,16 @@ export default {
       const resp = await fetch('http://localhost:8000/issues')
       const jsonResp = await resp.json()
       this.loading = false
-      console.log(jsonResp)
+      this.issues = jsonResp
     } catch (e) {
       console.error(e)
     }
   },
 }
 </script>
+
+<style>
+table {
+  font-size: 12px;
+}
+</style>

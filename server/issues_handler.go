@@ -15,7 +15,7 @@ type Issue struct {
 	Id          string `json:"id"`
 	Summary     string `json:"summary"`
 	Description string `json:"description"`
-	Assignee    string `json:"asignee"`
+	Assignee    string `json:"assignee"`
 	Type        string `json:"type"` //EPS or SE
 	Key         string `json:"key"`
 	Link        string `json:"link"`
