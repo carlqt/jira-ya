@@ -6260,6 +6260,11 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
 
+picnic@^6.5.5:
+  version "6.5.5"
+  resolved "https://registry.yarnpkg.com/picnic/-/picnic-6.5.5.tgz#0ae3d3d692edec1e1aa4f7a63893221f98827ed7"
+  integrity sha512-U23rCxul+6DfSnBbg2etvb2+p0wOpr2FLtpQWvwyEnad7kPdNhZuHGAh6ih2yrm9wG2umj0Os4DpNkLyQAduKA==
+
 picocolors@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-0.2.1.tgz#570670f793646851d1ba135996962abad587859f"
