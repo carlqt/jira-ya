@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
@@ -36,6 +37,11 @@ func NewApp() *App {
 }
 
 func main() {
-	app := NewApp()
-	app.Start()
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic(err)
+	} else {
+		app := NewApp()
+		app.Start()
+	}
 }
