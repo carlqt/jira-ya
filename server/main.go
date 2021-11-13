@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,6 +18,7 @@ type App struct {
 
 func (a *App) Start() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	port := os.Getenv("PORT")
 	corsOptions := cors.New(cors.Options{
 		// AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"OPTIONS", "GET", "POST"},
@@ -25,8 +27,8 @@ func (a *App) Start() {
 
 	loggedRouter := handlers.LoggingHandler(os.Stdout, a.Router)
 
-	log.Println("starting at port 8000")
-	http.ListenAndServe(":8000", corsOptions.Handler(loggedRouter))
+	log.Printf("starting at port %s", port)
+	http.ListenAndServe(fmt.Sprintf(":%s", port), corsOptions.Handler(loggedRouter))
 }
 
 func NewApp() *App {
