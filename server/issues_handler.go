@@ -8,10 +8,9 @@ import (
 	"github.com/carlqt/jira-ya/models"
 )
 
-// Get /issues returns all Issues
-func GetIssuesHandler(w http.ResponseWriter, r *http.Request) {
+func (a *App) GetIssuesHandler(w http.ResponseWriter, r *http.Request) {
 	queryType := r.URL.Query().Get("type")
-	issues, err := models.AllIssues()
+	issues, err := models.AllIssues(a.JiraConfig)
 	issues = issues.FilterByType(queryType)
 
 	if err != nil {

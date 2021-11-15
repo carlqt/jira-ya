@@ -6,14 +6,17 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/carlqt/jira-ya/jira"
 	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
 type App struct {
-	Router *mux.Router
+	JiraConfig *jira.JiraConfig
+}
+
+type Handlers struct {
 }
 
 func (a *App) Start() {
@@ -25,7 +28,7 @@ func (a *App) Start() {
 		AllowedHeaders: []string{"Content-Type"},
 	})
 
-	loggedRouter := handlers.LoggingHandler(os.Stdout, a.Router)
+	loggedRouter := handlers.LoggingHandler(os.Stdout, a.NewRouter())
 
 	log.Printf("starting at port %s", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), corsOptions.Handler(loggedRouter))
@@ -33,7 +36,7 @@ func (a *App) Start() {
 
 func NewApp() *App {
 	app := new(App)
-	app.Router = NewRouter()
+	app.JiraConfig = jira.DefaultJiraConfig()
 
 	return app
 }

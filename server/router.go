@@ -8,9 +8,9 @@ import "github.com/gorilla/mux"
 // DeleteIssue
 // UpdateIssue
 // CreateIssue
-func NewRouter() *mux.Router {
+func (a *App) NewRouter() *mux.Router {
 	router := mux.NewRouter()
-	router.HandleFunc("/issues", GetIssuesHandler).Methods("GET")
+	router.HandleFunc("/issues", a.GetIssuesHandler).Methods("GET")
 	router.Use(ResponseHeaderHandler)
 
 	return router

@@ -36,9 +36,9 @@ func (issues Issues) FilterByType(t string) Issues {
 	return newIssues
 }
 
-func AllIssues() (Issues, error) {
+func AllIssues(c *jira.JiraConfig) (Issues, error) {
 	var issues Issues
-	jiraIssues, err := jira.GetIssues()
+	jiraIssues, err := jira.GetIssues(c)
 
 	if err != nil {
 		return issues, err

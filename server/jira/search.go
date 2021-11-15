@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
-	"os"
 )
 
 type IssueType string
@@ -52,9 +52,9 @@ func (i *Issue) Link() string {
 	return link
 }
 
-func GetIssues() (SearchResponse, error) {
+func GetIssues(c *JiraConfig) (SearchResponse, error) {
 	var searchResponse SearchResponse
-	req, _ := jiraRequest()
+	req, _ := newSearchRequest(c)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -71,18 +71,16 @@ func GetIssues() (SearchResponse, error) {
 	return searchResponse, nil
 }
 
-func jiraRequest() (*http.Request, error) {
-	username := os.Getenv("USERNAME")
-	accessToken := os.Getenv("ACCESS_TOKEN")
-	url := "https://sephora-asia.atlassian.net/rest/api/latest/search"
-
+func newSearchRequest(c *JiraConfig) (*http.Request, error) {
+	searchPath := "search"
+	url := fmt.Sprintf("%s/%s", c.URL(), searchPath)
+	log.Println(url)
 	requestBody := SearchRequest{
 		Jql:        fmt.Sprintf("%s OR %s", seJql(), epsJql()),
 		Fields:     []string{"summary", "description", "status", "assignee"},
 		MaxResults: 50,
 	}
 	jsonBody, _ := json.Marshal(requestBody)
-
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonBody))
 
 	if err != nil {
@@ -90,7 +88,7 @@ func jiraRequest() (*http.Request, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(username, accessToken)
+	req.SetBasicAuth(c.Username, c.AccessToken)
 
 	return req, err
 }
