@@ -16,14 +16,10 @@ type App struct {
 	JiraConfig *jira.JiraConfig
 }
 
-type Handlers struct {
-}
-
 func (a *App) Start() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	port := os.Getenv("PORT")
 	corsOptions := cors.New(cors.Options{
-		// AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"OPTIONS", "GET", "POST"},
 		AllowedHeaders: []string{"Content-Type"},
 	})
