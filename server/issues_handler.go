@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
-	"github.com/carlqt/jira-ya/models"
 )
 
 func (a *App) GetIssuesHandler(w http.ResponseWriter, r *http.Request) {
 	queryType := r.URL.Query().Get("type")
-	issues, err := models.AllIssues(a.JiraConfig)
+	issues, err := a.Issues.AllIssues()
 	issues = issues.FilterByType(queryType)
 
 	if err != nil {

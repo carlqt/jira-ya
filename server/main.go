@@ -7,13 +7,16 @@ import (
 	"os"
 
 	"github.com/carlqt/jira-ya/jira"
+	"github.com/carlqt/jira-ya/models"
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
 type App struct {
-	JiraConfig *jira.JiraConfig
+	Issues interface {
+		AllIssues() (models.Issues, error)
+	}
 }
 
 func (a *App) Start() {
@@ -32,7 +35,7 @@ func (a *App) Start() {
 
 func NewApp() *App {
 	app := new(App)
-	app.JiraConfig = jira.DefaultJiraConfig()
+	app.Issues = models.IssueModel{Config: jira.DefaultJiraConfig()}
 
 	return app
 }

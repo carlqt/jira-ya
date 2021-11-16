@@ -5,15 +5,25 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/carlqt/jira-ya/jira"
+	"github.com/carlqt/jira-ya/models"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 )
 
+type mockIssuesModel struct{}
+
+func (m mockIssuesModel) AllIssues() (models.Issues, error) {
+	var issues models.Issues
+
+	issues = append(issues, models.Issue{})
+
+	return issues, nil
+}
+
 func TestGetIssuesHandler(t *testing.T) {
 	godotenv.Load(".env")
 	mockApp := App{
-		JiraConfig: jira.DefaultJiraConfig(),
+		Issues: mockIssuesModel{},
 	}
 
 	req, _ := http.NewRequest("GET", "/issues", nil)

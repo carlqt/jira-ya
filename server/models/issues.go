@@ -20,25 +20,13 @@ type Issue struct {
 
 type Issues []Issue
 
-func (issues Issues) FilterByType(t string) Issues {
-	var newIssues Issues
-
-	if t == "" {
-		return issues
-	}
-
-	for _, issue := range issues {
-		if issue.Type == strings.ToUpper(t) {
-			newIssues = append(newIssues, issue)
-		}
-	}
-
-	return newIssues
+type IssueModel struct {
+	Config *jira.JiraConfig
 }
 
-func AllIssues(c *jira.JiraConfig) (Issues, error) {
+func (i IssueModel) AllIssues() (Issues, error) {
 	var issues Issues
-	jiraIssues, err := jira.GetIssues(c)
+	jiraIssues, err := jira.GetIssues(i.Config)
 
 	if err != nil {
 		return issues, err
@@ -60,4 +48,20 @@ func AllIssues(c *jira.JiraConfig) (Issues, error) {
 	}
 
 	return issues, err
+}
+
+func (issues Issues) FilterByType(t string) Issues {
+	var newIssues Issues
+
+	if t == "" {
+		return issues
+	}
+
+	for _, issue := range issues {
+		if issue.Type == strings.ToUpper(t) {
+			newIssues = append(newIssues, issue)
+		}
+	}
+
+	return newIssues
 }
